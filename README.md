@@ -11,7 +11,7 @@ The network currently only supports mutation ΔΔGs, not necessarily any metric 
 
 ## Installation
 
-DMS-Fold is a modified version of OpenFold. See [OpenFold's Github](https://github.com/aqlaboratory/openfold) for instructions on installing openfold dependencies and conda requirements.
+DMS-Fold is a modified version of OpenFold. See [OpenFold's Documentation](https://openfold.readthedocs.io/en/latest/) for instructions on installing openfold dependencies and conda requirements.
 
 DMS-Fold weights can be downloaded from https://huggingface.co/drake463/DMS-Fold/tree/main. The path to the weights can be specified via '--openfold_checkpoint_path', which by default is not set.
 
