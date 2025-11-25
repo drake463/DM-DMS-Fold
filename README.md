@@ -13,7 +13,7 @@ The network currently only supports mutation ΔΔGs, not necessarily any metric 
 
 DMS-Fold is a modified version of OpenFold. See [OpenFold's Github](https://github.com/aqlaboratory/openfold) for instructions on installing openfold dependencies and conda requirements.
 
-DMS-Fold weights can be downloaded from https://huggingface.co/drake463/DMS-Fold/tree/main. The path to the weights can be specified via '--checkpoint_path', which by default is not set.
+DMS-Fold weights can be downloaded from https://huggingface.co/drake463/DMS-Fold/tree/main. The path to the weights can be specified via '--openfold_checkpoint_path', which by default is not set.
 
 ## Formatting DMS Input CSV
 
@@ -31,23 +31,30 @@ seq_n,wt_res,mut_res,ddG
 ```  
 
 ## Usage
-DMS-Fold requires a protein sequence FASTA file, CSV with dms data, and the databases used by OpenFold for MSA/template information.
+DMS-Fold requires a protein sequence FASTA file, CSV with dms data, and the databases used by OpenFold for MSA/template information. A directory containing fastas files, and a corresponding directory containing matching dms CSVs should be specified. CSVs should start with the same name as the fasta file, with addition of '_dms.csv'. 
  
 ```bash
 python3 predict_with_dmsfold.py \
-    fasta.fasta \
-    dms_data.csv \
-    --checkpoint_path openfold/resources/dmsfold_weights.pt \
+    $INPUT_FASTA_DIR \
+    $INPUT_DMS_DIR \
+    $TEMPLATE_MMCIF_DIR \    
+    --openfold_checkpoint_path openfold/resources/dmsfold_weights.pt \
     --uniref90_database_path uniref90.fasta \
     --mgnify_database_path mgy_clusters_2018_12.fa \
     --pdb70_database_path pdb70/pdb70 \
     --uniclust30_database_path uniclust30/uniclust30_2018_08/uniclust30_2018_08 \
     --bfd_database_path bfd/bfd_metaclust_clu_complete_id30_c90_final_seq.sorted_opt \
-    --jackhmmer_binary_path lib/conda/envs/openfold_venv/bin/jackhmmer \
-    --hhblits_binary_path lib/conda/envs/openfold_venv/bin/hhblits \
-    --hhsearch_binary_path lib/conda/envs/openfold_venv/bin/hhsearch \
-    --kalign_binary_path lib/conda/envs/openfold_venv/bin/kalign
+    --model_device "cuda:0" \
+    --config_preset model_5_ptm
 ```
+### Required Arguments:
+*'$INPUT_FASTA_DIR': Directory of query fasta files, one sequence per file.
+*'$INPUT_DMS_DIR': Directory of dms CSVs corresponding to fasta files in '$INPUT_FASTA_DIR'
+*'$TEMPLATE_MMCIF_DIR': MMCIF files to use for template matching. This directory is required even though DMS-Fold peforms template-free inference.
+*'_database_path': Paths to sequence databases for sequence alignment.
+*'--model_device': Specify to use a GPU if one is available.
+*'--config_preset': Must specify model_5_ptm when using DMS-Fold.
+
 The use of MSA-subsampling can be specified with `--neff` and size-dependent neff can be specified with `--neff_size_dependent`
 
 ## Example
