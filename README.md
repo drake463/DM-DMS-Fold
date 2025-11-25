@@ -47,18 +47,18 @@ python3 predict_with_dmsfold.py \
     --model_device "cuda:0" \
     --config_preset model_5_ptm
 ```
-### Required Arguments:
-*'$INPUT_FASTA_DIR': Directory of query fasta files, one sequence per file.
-*'$INPUT_DMS_DIR': Directory of dms CSVs corresponding to fasta files in '$INPUT_FASTA_DIR'
-*'$TEMPLATE_MMCIF_DIR': MMCIF files to use for template matching. This directory is required even though DMS-Fold peforms template-free inference.
-*'_database_path': Paths to sequence databases for sequence alignment.
-*'--model_device': Specify to use a GPU if one is available.
-*'--config_preset': Must specify model_5_ptm when using DMS-Fold.
+#### Required Arguments:
+* `$INPUT_FASTA_DIR`: Directory of query fasta files, one sequence per file.
+* `$INPUT_DMS_DIR`: Directory of dms CSVs corresponding to fasta files in '$INPUT_FASTA_DIR'
+* `$TEMPLATE_MMCIF_DIR`: MMCIF files to use for template matching. This directory is required even though DMS-Fold peforms template-free inference.
+* `*_database_path`: Paths to sequence databases for sequence alignment.
+* `--model_device`: Specify to use a GPU if one is available.
+* `--config_preset`: Must specify model_5_ptm when using DMS-Fold.
 
 The use of MSA-subsampling can be specified with `--neff` and size-dependent neff can be specified with `--neff_size_dependent`
 
 ## Example
-An example command with a provided fasta file, dms csv, and precomputed alignments for 1PWT are located within the directory named 'example'. Expected outputs of relaxed and unrelaxed DMS-Fold predictions and feature pickle file are also provided. To enable deterministic predictions, a singular seed should be specified with '--seed.'
+An example command with a provided fasta directory, dms directory, and precomputed alignments for 1PWT are located within the directory named 'example'. Expected outputs of relaxed and unrelaxed DMS-Fold predictions and feature pickle file are also provided. To enable deterministic predictions, a singular seed should be specified with '--seed.'
 
 ## Network Weights
 The weights can be found on the [DMS-Fold model repository](https://huggingface.co/LindertLab/DMS-Fold/tree/main) on huggingface.co. Once downloaded, the weights should be added to DMS-Fold/openfold/resources/. The path to the weights can be specified with `--checkpoint_path'.
