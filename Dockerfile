@@ -29,7 +29,7 @@ RUN export LD_LIBRARY_PATH=${CONDA_PREFIX}/lib:${LD_LIBRARY_PATH}
 
 COPY openfold /opt/openfold/openfold
 COPY scripts /opt/openfold/scripts
-COPY run_pretrained_openfold.py /opt/openfold/run_pretrained_openfold.py
+COPY predict_with_dmsfold.py /opt/openfold/predict_with_dmsfold.py
 COPY train_openfold.py /opt/openfold/train_openfold.py
 COPY setup.py /opt/openfold/setup.py
 RUN wget -q -P /opt/openfold/openfold/resources \
