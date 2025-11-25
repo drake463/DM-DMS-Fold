@@ -353,6 +353,9 @@ config = mlc.ConfigDict(
                     ],
                     "true_msa": [NUM_MSA_SEQ, NUM_RES],
                     "use_clamped_fape": [],
+                    "dms": [
+                        NUM_RES, NUM_RES, None,
+                    ],
                 },
                 "block_delete_msa": {
                     "msa_fraction_per_block": 0.3,
@@ -383,6 +386,7 @@ config = mlc.ConfigDict(
                     "between_segment_residues",
                     "deletion_matrix",
                     "no_recycling_iters",
+                    "dms",
                 ],
                 "use_templates": templates_enabled,
                 "use_template_torsion_angles": embed_template_torsion_angles,
@@ -493,6 +497,9 @@ config = mlc.ConfigDict(
                 "c_z": c_z,
                 "c_m": c_m,
                 "relpos_k": 32,
+            },
+            "dms_embedder": {
+                "c_z": c_z,
             },
             "recycling_embedder": {
                 "c_z": c_z,

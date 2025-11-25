@@ -22,6 +22,41 @@ from openfold.utils.tensor_utils import (
     tensor_tree_map,
 )
 
+import numpy as np
+from scipy.spatial.distance import pdist, squareform
+
+def get_eff(msa, eff_cutoff=0.8):
+    if msa.ndim ==3: msa = msa.argmax(-1)
+    msa_sm = 1.0 - squareform(pdist(msa,"hamming"))
+    msa_w = (msa_sm >= eff_cutoff).astype(float)
+    msa_w = 1/np.sum(msa_w,-1)
+
+    return msa_w
+def subsample_msa_sequentially(msa, neff=10, eff_cutoff=0.8, cap_msa=True):
+    if msa.shape[0]==1:
+        return np.array([0])
+    indices = [0]
+    idx = np.arange(msa.shape[0]-1)+1
+    np.random.shuffle(idx)
+
+    new = [msa[0]]
+
+    for i in idx:
+        new.append(msa[i])
+        indices.append(i)
+        neff_ = get_eff(np.array(new), eff_cutoff=eff_cutoff).sum()
+
+        if cap_msa:
+            if neff_ > neff or len(new) > 126:
+                new.pop()
+                indices.pop()
+                break
+        else:
+            if neff_ > neff:
+                new.pop()
+                indices.pop()
+                break
+    return np.array(indices)
 
 class OpenFoldSingleDataset(torch.utils.data.Dataset):
     def __init__(self,
@@ -193,7 +228,7 @@ class OpenFoldSingleDataset(torch.utils.data.Dataset):
             alignment_dir=alignment_dir,
             chain_id=chain_id,
             alignment_index=alignment_index,
-            seqemb_mode=self.config.seqemb_mode.enabled
+            seqemb_mode=self.config.seqemb_mode.enabled,
         )
 
         return data
@@ -212,7 +247,6 @@ class OpenFoldSingleDataset(torch.utils.data.Dataset):
         if self.alignment_index is not None:
             alignment_dir = self.alignment_dir
             alignment_index = self.alignment_index[name]
-
         if self.mode == 'train' or self.mode == 'eval':
             spl = name.rsplit('_', 1)
             if len(spl) == 2:
@@ -220,8 +254,8 @@ class OpenFoldSingleDataset(torch.utils.data.Dataset):
             else:
                 file_id, = spl
                 chain_id = None
-
-            path = os.path.join(self.data_dir, file_id)
+            #path = os.path.join(self.data_dir, file_id)
+            path = os.path.join(self.data_dir, name)
             if self._structure_index is not None:
                 structure_index_entry = self._structure_index[name]
                 assert (len(structure_index_entry["files"]) == 1)
@@ -240,7 +274,7 @@ class OpenFoldSingleDataset(torch.utils.data.Dataset):
             path += ext
             if ext == ".cif":
                 data = self._parse_mmcif(
-                    path, file_id, chain_id, alignment_dir, alignment_index,
+                    path, file_id, chain_id, alignment_dir, alignment_index
                 )
             elif ext == ".core":
                 data = self.data_pipeline.process_core(
@@ -273,6 +307,13 @@ class OpenFoldSingleDataset(torch.utils.data.Dataset):
 
         if self._output_raw:
             return data
+
+        if self.mode == 'train':
+            msa = data['msa']
+            neff = np.random.randint(1,25)
+            msa_indices = subsample_msa_sequentially(msa, neff=neff)
+            data['msa'] = data['msa'][msa_indices]
+            data['deletion_matrix_int'] = data['deletion_matrix_int'][msa_indices]
 
         feats = self.feature_pipeline.process_features(
             data, self.mode

@@ -245,6 +245,9 @@ def delete_extra_msa(protein):
             del protein["extra_" + k]
     return protein
 
+def dms(protein):
+    protein["dms"] = protein["dms"].clone().detach().to(torch.float32)
+    return protein
 
 # Not used in inference
 @curry1

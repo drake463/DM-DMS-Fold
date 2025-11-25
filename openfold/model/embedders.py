@@ -153,6 +153,30 @@ class InputEmbedder(nn.Module):
 
         return msa_emb, pair_emb
 
+class DMSEmbedder(nn.Module):
+    """
+    Embeds DMS features.
+    """
+    def __init__(
+        self,
+        c_z: int,
+        **kwargs,
+    ):
+        """
+        Args:
+            c_z:
+                pair embedding channel dimension
+        """
+        super(DMSEmbedder, self).__init__()
+
+        self.c_z = c_z
+
+        self.linear = Linear(1,self.c_z)
+    def forward(
+        self,
+        x: torch.Tensor,
+        ) -> Tuple[torch.Tensor, torch.Tensor]:
+            return self.linear(x)
 
 class InputEmbedderMultimer(nn.Module):
     """

@@ -3,7 +3,11 @@ import logging
 import os
 import sys
 import json
-
+import torch.multiprocessing as mp
+try:
+    mp.set_sharing_strategy("file_system")
+except RuntimeError:
+    pass
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks.lr_monitor import LearningRateMonitor
 from pytorch_lightning.callbacks import DeviceStatsMonitor

@@ -34,6 +34,7 @@ from openfold.model.embedders import (
     TemplateEmbedderMultimer,
     ExtraMSAEmbedder,
     PreembeddingEmbedder,
+    DMSEmbedder
 )
 from openfold.model.evoformer import EvoformerStack, ExtraMSAStack
 from openfold.model.heads import AuxiliaryHeads
@@ -131,6 +132,10 @@ class AlphaFold(nn.Module):
         )
         self.aux_heads = AuxiliaryHeads(
             self.config["heads"],
+        )
+
+        self.dms_embedder = DMSEmbedder(
+            **self.config["dms_embedder"],
         )
 
     def embed_templates(self, batch, feats, z, pair_mask, templ_dim, inplace_safe):
@@ -400,7 +405,7 @@ class AlphaFold(nn.Module):
                     inplace_safe=inplace_safe,
                     _mask_trans=self.config._mask_trans,
                 )
-
+        z = z + self.dms_embedder(feats["dms"])
         # Run MSA + pair embeddings through the trunk of the network
         # m: [*, S, N, C_m]
         # z: [*, N, N, C_z]

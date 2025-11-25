@@ -129,9 +129,13 @@ def make_sequence_features(
     )
     return features
 
+def make_dms_features(pdbid):
+    x = torch.load(os.path.join('/data/tensors/', pdbid+'.pt'), map_location="cpu", weights_only=True)
+    return x
+
 
 def make_mmcif_features(
-    mmcif_object: mmcif_parsing.MmcifObject, chain_id: str
+    mmcif_object: mmcif_parsing.MmcifObject, chain_id: str,
 ) -> FeatureDict:
     input_sequence = mmcif_object.chain_to_seqres[chain_id]
     description = "_".join([mmcif_object.file_id, chain_id])
@@ -162,6 +166,10 @@ def make_mmcif_features(
     )
 
     mmcif_feats["is_distillation"] = np.array(0., dtype=np.float32)
+
+    dms_data = make_dms_features(description)
+
+    mmcif_feats['dms'] = dms_data
 
     return mmcif_feats
 
