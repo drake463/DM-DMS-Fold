@@ -193,6 +193,8 @@ def load_dms(dms_csv,seq):
     for _, row in df.iterrows():
         pos = int(row["seq_n"]) -1
         aa_from, aa_to, val = row["wt_res"], row["mut_res"], float(row["ddG"])
+        if aa_from == aa_to:
+            continue
         if aa_from != 'C':
             num[pos] += correlations[aa_from][aa_to] * val
             den[pos] += correlations[aa_from][aa_to]
