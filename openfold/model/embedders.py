@@ -154,29 +154,32 @@ class InputEmbedder(nn.Module):
         return msa_emb, pair_emb
 
 class DMSEmbedder(nn.Module):
-    """
-    Embeds DMS features.
-    """
-    def __init__(
-        self,
-        c_z: int,
-        **kwargs,
-    ):
-        """
-        Args:
-            c_z:
-                pair embedding channel dimension
-        """
-        super(DMSEmbedder, self).__init__()
+    def __init__(self, c_m: int, c_z: int, hidden: int = 64, dropout: float = 0.2):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(1, hidden),
+            nn.GELU(),
+            nn.Dropout(dropout),
+            nn.Linear(hidden, c_z),
+        )
+        # Start as no-op (recommended)
+        nn.init.zeros_(self.net[-1].weight)
+        nn.init.zeros_(self.net[-1].bias)
 
-        self.c_z = c_z
+    def forward(self, x: torch.Tensor, pair_mask: torch.Tensor | None = None) -> torch.Tensor:
+        # x: [..., N, N, 1]
+        x = x.to(dtype=self.net[0].weight.dtype)
 
-        self.linear = Linear(1,self.c_z)
-    def forward(
-        self,
-        x: torch.Tensor,
-        ) -> Tuple[torch.Tensor, torch.Tensor]:
-            return self.linear(x)
+        # mask missing values where x==0
+        #mask = (x != 0).to(dtype=x.dtype)  # [..., N, N, 1]
+
+        # also respect padding mask if provided
+        #if pair_mask is not None:
+        #    mask = mask * pair_mask.to(dtype=x.dtype)[..., None]  # [..., N, N, 1]
+
+        z_dms = self.net(x)
+        #z_dms = z_dms * mask  # hard gate to prevent bias leakage
+        return z_dms
 
 class InputEmbedderMultimer(nn.Module):
     """
