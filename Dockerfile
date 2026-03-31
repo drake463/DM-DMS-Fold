@@ -3,7 +3,7 @@ FROM nvidia/cuda:12.1.1-cudnn8-devel-ubuntu22.04
 # metainformation
 LABEL org.opencontainers.image.version="2.0.0"
 LABEL org.opencontainers.image.authors="Lindert Lab"
-LABEL org.opencontainers.image.source="https://github.com/LindertLab/DMS-Fold"
+LABEL org.opencontainers.image.source="https://github.com/drake463/DM-DMS-Fold"
 LABEL org.opencontainers.image.licenses="Apache-2.0"
 LABEL org.opencontainers.image.base.name="docker.io/nvidia/cuda:12.4.1-devel-ubuntu22.04"
 
@@ -29,7 +29,7 @@ RUN export LD_LIBRARY_PATH=${CONDA_PREFIX}/lib:${LD_LIBRARY_PATH}
 
 COPY openfold /opt/openfold/openfold
 COPY scripts /opt/openfold/scripts
-COPY predict_with_dmsfold.py /opt/openfold/predict_with_dmsfold.py
+COPY predict_with_dm_dmsfold.py /opt/openfold/predict_with_dm_dmsfold.py
 COPY train_openfold.py /opt/openfold/train_openfold.py
 COPY setup.py /opt/openfold/setup.py
 RUN wget -q -P /opt/openfold/openfold/resources \
