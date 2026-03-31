@@ -405,7 +405,8 @@ class AlphaFold(nn.Module):
                     inplace_safe=inplace_safe,
                     _mask_trans=self.config._mask_trans,
                 )
-        z = z + self.dms_embedder(feats["dms"])
+        z_dms = z + self.dms_embedder(feats["dms"], pair_mask=pair_mask)
+        z = add(z, z_dms, inplace=inplace_safe)
         # Run MSA + pair embeddings through the trunk of the network
         # m: [*, S, N, C_m]
         # z: [*, N, N, C_z]
