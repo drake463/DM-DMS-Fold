@@ -500,6 +500,7 @@ config = mlc.ConfigDict(
             },
             "dms_embedder": {
                 "c_z": c_z,
+                "c_m": 1,
             },
             "recycling_embedder": {
                 "c_z": c_z,
